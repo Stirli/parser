@@ -31,13 +31,22 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
+global.fileName;
 
-
-app.get('/', (req, res) =>{
-  sendFile('index.html', 'text/html', res)
+app.get('/delete', (req, res, next) =>{
+  req.url = 'index.html';
+  if(fileName){
+    fs.unlinkSync(`./uploads/${fileName}`);
+    fileName = null;
+  }
+  next();
 });
 
-global.fileName;
+app.get('/', (req, res) =>{
+  fileName = null;
+  sendFile('index.html', 'text/html', res);
+});
+
 
 
 app.post('/upload', (req, res) =>{
@@ -49,12 +58,12 @@ app.post('/upload', (req, res) =>{
 });
 
 app.get('/viewing', (req, res) =>{
+
   sendFile('result.html', 'text/html', res);
 });
 
 app.get('/parse', (req, res) =>{
   let disciplines = sorting();
-  fileName = null;
   res.end(JSON.stringify(disciplines));
 });
 
@@ -93,6 +102,5 @@ let sorting = () =>{
 
   let dis = sorting.groups;
   delete require.cache[require.resolve('./sort')];
-
   return dis;
 };
