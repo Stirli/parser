@@ -23,10 +23,18 @@ dropZone.addEventListener('drop', ev => {
 
 dropZone.addEventListener('click', () => {
   input.click();
-});
 
-input.addEventListener('change', () => {
-  send();
+  input.addEventListener('change', () => {
+    let result = checkFilesType(input.files);
+    if (result.sucsess) {
+      let fileList = input.files;
+      input.files = fileList;
+      send();
+      return;
+    }
+
+    alert(result.message);
+  });
 });
 
 
